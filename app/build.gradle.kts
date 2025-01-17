@@ -1,3 +1,7 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+import java.io.FileInputStream
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +9,19 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        val keystoreProperties = Properties().apply {
+            load(FileInputStream(project.file("keystore.properties")))
+        }
+
+        create("release") {
+            storeFile = file(keystoreProperties.getProperty("storeFile"))
+            storePassword = keystoreProperties.getProperty("storePassword")
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+        }
+    }
+
     namespace = "app.hankdev.tasuku"
     compileSdk = 35
 
@@ -13,14 +30,14 @@ android {
         minSdk = 29
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
